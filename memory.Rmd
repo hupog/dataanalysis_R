@@ -1,0 +1,146 @@
+---
+title: "Memoria Trabajo Final ME"
+output: html_document
+date: "2024-2025"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+**Conjuntos de datos analizados:**
+- Salario por Sexo y Ocupación
+- Salario por Sexo y Sector
+- Satisfacción en el Empleo
+- Tiempo de Trabajo
+- Ocupados por Sexo y Rama de Actividad
+
+---
+
+# Lectura de los datasets
+
+```{r}
+# Leemos los datasets
+salarioSexoOcupacion <- read.csv("./datasets/salarioSexoOcupacion2022.csv", TRUE, sep = ";")
+salarioSexoSector <- read.csv("./datasets/salarioSexoSector2022.csv", TRUE, sep = ";")
+satisfaccionEmpleo <- read.csv("./datasets/satisfaccionEmpleo.csv", TRUE, sep = ";")
+tiempoEmpleo <- read.csv("./datasets/tiempoEmpleo.csv", TRUE, sep = ";")
+ocupadosSexoRama <- read.csv("./datasets/ocupadosSexoRama.csv", TRUE, sep = ";")
+```
+
+---
+
+# Transformaciones y Ajustes
+
+## Salario por Sexo y Ocupación
+
+```{r}
+# Echamos un vistazo inicial a los datos
+head(salarioSexoOcupacion)
+head(salarioSexoSector)
+head(satisfaccionEmpleo)
+head(tiempoEmpleo)
+head(ocupadosSexoRama)
+```
+
+## Salario por Sexo y Ocupación
+
+```{r}
+# Cambiamos nombres de columnas para mayor legibilidad
+colnames(salarioSexoOcupacion)[colnames(salarioSexoOcupacion) == "Grupos.principales.de.la.CNO.11"] <- "Ocupación"
+
+# Ajustamos tipos de datos
+salarioSexoOcupacion$Ocupación <- as.factor(salarioSexoOcupacion$Ocupación)
+salarioSexoOcupacion$Sexo <- as.factor(salarioSexoOcupacion$Sexo)
+
+# Convertimos "Total" a numérico
+salarioSexoOcupacion$Total <- gsub("\\.", "", salarioSexoOcupacion$Total)
+salarioSexoOcupacion$Total <- gsub(",", ".", salarioSexoOcupacion$Total)
+salarioSexoOcupacion$Total <- as.numeric(salarioSexoOcupacion$Total)
+
+# Exploramos la estructura final
+str(salarioSexoOcupacion)
+```
+
+## Salario por Sexo y Sector
+
+```{r}
+# Cambiamos nombres de columnas para mayor legibilidad
+colnames(salarioSexoSector)[colnames(salarioSexoSector) == "Sectores.de.actividad"] <- "Sector"
+colnames(salarioSexoSector)[colnames(salarioSexoSector) == "Comunidades.autónomas"] <- "CA"
+
+# Ajustamos tipos de datos
+salarioSexoSector$CA <- as.factor(salarioSexoSector$CA)
+salarioSexoSector$Sector <- as.factor(salarioSexoSector$Sector)
+salarioSexoSector$Sexo <- as.factor(salarioSexoSector$Sexo)
+
+# Convertimos "Total" a numérico
+salarioSexoSector$Total <- gsub("\\.", "", salarioSexoSector$Total)
+salarioSexoSector$Total <- gsub(",", ".", salarioSexoSector$Total)
+salarioSexoSector$Total <- as.numeric(salarioSexoSector$Total)
+
+# Exploramos la estructura final
+str(salarioSexoSector)
+```
+
+## Satisfacción en el Empleo
+
+```{r}
+# Cambiamos nombres de columnas para mayor legibilidad
+colnames(satisfaccionEmpleo)[colnames(satisfaccionEmpleo) == "País.de.nacimiento"] <- "País"
+colnames(satisfaccionEmpleo)[colnames(satisfaccionEmpleo) == "Tipo.de.dato"] <- "Unidad"
+colnames(satisfaccionEmpleo)[colnames(satisfaccionEmpleo) == "Según.sea.el.nivel.de.satisfacción.en.su.empleo.actual"] <- "Satisfacción"
+
+# Ajustamos tipos de datos
+satisfaccionEmpleo$País <- as.factor(satisfaccionEmpleo$País)
+satisfaccionEmpleo$Unidad <- as.factor(satisfaccionEmpleo$Unidad)
+satisfaccionEmpleo$Satisfacción <- as.factor(satisfaccionEmpleo$Satisfacción)
+
+# Convertimos "Total" a numérico
+satisfaccionEmpleo$Total <- gsub("\\.", "", satisfaccionEmpleo$Total)
+satisfaccionEmpleo$Total <- gsub(",", ".", satisfaccionEmpleo$Total)
+satisfaccionEmpleo$Total <- as.numeric(satisfaccionEmpleo$Total)
+
+# Exploramos la estructura final
+str(satisfaccionEmpleo)
+```
+
+## Tiempo de Trabajo
+
+```{r}
+# Cambiamos nombres de columnas para mayor legibilidad
+colnames(tiempoEmpleo)[colnames(tiempoEmpleo) == "Sectores.de.actividad.CNAE.2009"] <- "SectorActividad"
+colnames(tiempoEmpleo)[colnames(tiempoEmpleo) == "Tiempo.de.trabajo"] <- "TiempoTrabajo"
+colnames(tiempoEmpleo)[colnames(tiempoEmpleo) == "Total"] <- "HorasTotales"
+
+# Ajustamos tipos de datos
+tiempoEmpleo$SectorActividad <- as.factor(tiempoEmpleo$SectorActividad)
+tiempoEmpleo$TiempoTrabajo <- as.factor(tiempoEmpleo$TiempoTrabajo)
+
+# Convertimos "HorasTotales" a numérico
+tiempoEmpleo$HorasTotales <- gsub("\\.", "", tiempoEmpleo$HorasTotales)
+tiempoEmpleo$HorasTotales <- gsub(",", ".", tiempoEmpleo$HorasTotales)
+tiempoEmpleo$HorasTotales <- as.numeric(tiempoEmpleo$HorasTotales)
+
+# Exploramos la estructura final
+str(tiempoEmpleo)
+```
+
+## Ocupados por Sexo y Rama de Actividad
+
+```{r}
+# Cambiamos nombres de columnas para mayor legibilidad
+colnames(ocupadosSexoRama)[colnames(ocupadosSexoRama) == "Rama.de.actividad.CNAE.2009"] <- "RamaActividad"
+
+# Ajustamos tipos de datos
+ocupadosSexoRama$RamaActividad <- as.factor(ocupadosSexoRama$RamaActividad)
+ocupadosSexoRama$Sexo <- as.factor(ocupadosSexoRama$Sexo)
+
+# Convertimos "HorasTotales" a numérico
+ocupadosSexoRama$Total <- gsub("\\.", "", ocupadosSexoRama$Total)
+ocupadosSexoRama$Total <- gsub(",", ".", ocupadosSexoRama$Total)
+ocupadosSexoRama$Total <- as.numeric(ocupadosSexoRama$Total)
+
+# Exploramos la estructura final
+str(ocupadosSexoRama)
+```
