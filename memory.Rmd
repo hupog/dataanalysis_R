@@ -137,9 +137,9 @@ ocupadosSexoRama$RamaActividad <- as.factor(ocupadosSexoRama$RamaActividad)
 ocupadosSexoRama$Sexo <- as.factor(ocupadosSexoRama$Sexo)
 
 # Convertimos "HorasTotales" a numérico
-ocupadosSexoRama$Total <- gsub("\\.", "", ocupadosSexoRama$Total)
-ocupadosSexoRama$Total <- gsub(",", ".", ocupadosSexoRama$Total)
-ocupadosSexoRama$Total <- as.numeric(ocupadosSexoRama$Total)
+ocupadosSexoRama$HorasTotales <- gsub("\\.", "", ocupadosSexoRama$HorasTotales)
+ocupadosSexoRama$HorasTotales <- gsub(",", ".", ocupadosSexoRama$HorasTotales)
+ocupadosSexoRama$HorasTotales <- as.numeric(ocupadosSexoRama$HorasTotales)
 
 # Exploramos la estructura final
 str(ocupadosSexoRama)

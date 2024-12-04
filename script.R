@@ -74,8 +74,8 @@ ocupadosSexoRama$RamaActividad<-as.factor(ocupadosSexoRama$RamaActividad)
 ocupadosSexoRama$Sexo<-as.factor(ocupadosSexoRama$Sexo)
 ocupadosSexoRama$Unidad<-as.factor(ocupadosSexoRama$Unidad)
 
-ocupadosSexoRama$Total <- gsub("\\.", "", ocupadosSexoRama$Total)
-ocupadosSexoRama$Total <- gsub(",", ".", ocupadosSexoRama$Total)
-ocupadosSexoRama$Total<-as.numeric(ocupadosSexoRama$Total)
+ocupadosSexoRama$HorasTotales <- gsub("\\.", "", ocupadosSexoRama$HorasTotales)
+ocupadosSexoRama$HorasTotales <- gsub(",", ".", ocupadosSexoRama$HorasTotales)
+ocupadosSexoRama$HorasTotales<-as.numeric(ocupadosSexoRama$HorasTotales)
 str(ocupadosSexoRama)
 
