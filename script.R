@@ -79,3 +79,14 @@ ocupadosSexoRama$HorasTotales <- gsub(",", ".", ocupadosSexoRama$HorasTotales)
 ocupadosSexoRama$HorasTotales<-as.numeric(ocupadosSexoRama$HorasTotales)
 str(ocupadosSexoRama)
 
+
+library(ggplot2)
+
+ggplot(salarioSexoOcupacion, aes(x = Periodo, y = Total, color = Sexo)) +
+  geom_line() +
+  facet_wrap(~ Ocupación, scales = "free_y") +
+  labs(title = "Salaries Over Time by Occupation and Gender",
+       x = "Year",
+       y = "Salary") +
+  theme_minimal()
+
