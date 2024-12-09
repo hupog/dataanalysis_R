@@ -37,6 +37,7 @@ salarioSexoOcupacion$Sexo<-as.factor(salarioSexoOcupacion$Sexo)
 
 salarioSexoOcupacion$Total <- gsub("\\.", "", salarioSexoOcupacion$Total)
 salarioSexoOcupacion$Total <- gsub(",", ".", salarioSexoOcupacion$Total)
+salarioSexoOcupacion$Total <- gsub("-", "", salarioSexoOcupacion$Total)
 salarioSexoOcupacion$Total<-as.numeric(salarioSexoOcupacion$Total) 
 str(salarioSexoOcupacion)
 
@@ -47,6 +48,7 @@ salarioSexoSector$Sexo<-as.factor(salarioSexoSector$Sexo)
 
 salarioSexoSector$Total <- gsub("\\.", "", salarioSexoSector$Total)
 salarioSexoSector$Total <- gsub(",", ".", salarioSexoSector$Total)
+salarioSexoSector$Total <- gsub("-", "", salarioSexoSector$Total)
 salarioSexoSector$Total<-as.numeric(salarioSexoSector$Total)
 str(salarioSexoSector)
 
@@ -57,6 +59,7 @@ satisfaccionEmpleo$Satisfacción<-as.factor(satisfaccionEmpleo$Satisfacción)
 
 satisfaccionEmpleo$Total <- gsub("\\.", "", satisfaccionEmpleo$Total)
 satisfaccionEmpleo$Total <- gsub(",", ".", satisfaccionEmpleo$Total)
+satisfaccionEmpleo$Total <- gsub("-", "", satisfaccionEmpleo$Total)
 satisfaccionEmpleo$Total<-as.numeric(satisfaccionEmpleo$Total)
 str(satisfaccionEmpleo)
 
@@ -66,6 +69,7 @@ tiempoEmpleo$TiempoTrabajo<-as.factor(tiempoEmpleo$TiempoTrabajo)
 
 tiempoEmpleo$HorasTotales <- gsub("\\.", "", tiempoEmpleo$HorasTotales)
 tiempoEmpleo$HorasTotales <- gsub(",", ".", tiempoEmpleo$HorasTotales)
+tiempoEmpleo$HorasTotales <- gsub("-", "", tiempoEmpleo$HorasTotales)
 tiempoEmpleo$HorasTotales<-as.numeric(tiempoEmpleo$HorasTotales)
 str(tiempoEmpleo)
 
@@ -76,17 +80,19 @@ ocupadosSexoRama$Unidad<-as.factor(ocupadosSexoRama$Unidad)
 
 ocupadosSexoRama$HorasTotales <- gsub("\\.", "", ocupadosSexoRama$HorasTotales)
 ocupadosSexoRama$HorasTotales <- gsub(",", ".", ocupadosSexoRama$HorasTotales)
+ocupadosSexoRama$HorasTotales <- gsub("-", "", ocupadosSexoRama$HorasTotales)
 ocupadosSexoRama$HorasTotales<-as.numeric(ocupadosSexoRama$HorasTotales)
 str(ocupadosSexoRama)
 
 
 library(ggplot2)
 
-ggplot(salarioSexoOcupacion, aes(x = Periodo, y = Total, color = Sexo)) +
+# Filter data for specific occupation and create plot
+filtered_data <- salarioSexoOcupacion[salarioSexoOcupacion$Ocupación == "D Técnicos, profesionales de apoyo", ]
+
+ggplot(filtered_data, aes(x = Periodo, y = Total, color = Sexo)) +
   geom_line() +
-  facet_wrap(~ Ocupación, scales = "free_y") +
-  labs(title = "Salaries Over Time by Occupation and Gender",
+  labs(title = "Salaries Over Time for Technical Support Professionals by Gender",
        x = "Year",
        y = "Salary") +
   theme_minimal()
-
