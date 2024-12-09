@@ -71,6 +71,7 @@ tiempoEmpleo$HorasTotales <- gsub("\\.", "", tiempoEmpleo$HorasTotales)
 tiempoEmpleo$HorasTotales <- gsub(",", ".", tiempoEmpleo$HorasTotales)
 tiempoEmpleo$HorasTotales <- gsub("-", "", tiempoEmpleo$HorasTotales)
 tiempoEmpleo$HorasTotales<-as.numeric(tiempoEmpleo$HorasTotales)
+tiempoEmpleo$Periodo <- factor(tiempoEmpleo$Periodo, levels = unique(tiempoEmpleo$Periodo))
 str(tiempoEmpleo)
 
 str(ocupadosSexoRama)
@@ -82,17 +83,121 @@ ocupadosSexoRama$HorasTotales <- gsub("\\.", "", ocupadosSexoRama$HorasTotales)
 ocupadosSexoRama$HorasTotales <- gsub(",", ".", ocupadosSexoRama$HorasTotales)
 ocupadosSexoRama$HorasTotales <- gsub("-", "", ocupadosSexoRama$HorasTotales)
 ocupadosSexoRama$HorasTotales<-as.numeric(ocupadosSexoRama$HorasTotales)
+ocupadosSexoRama$Periodo <- factor(ocupadosSexoRama$Periodo, levels = unique(ocupadosSexoRama$Periodo))
 str(ocupadosSexoRama)
 
-
+install.packages("ggplot2")
 library(ggplot2)
 
-# Filter data for specific occupation and create plot
-filtered_data <- salarioSexoOcupacion[salarioSexoOcupacion$Ocupación == "D Técnicos, profesionales de apoyo", ]
+############ COMPARACION SALARIOS ############
 
-ggplot(filtered_data, aes(x = Periodo, y = Total, color = Sexo)) +
-  geom_line() +
-  labs(title = "Salaries Over Time for Technical Support Professionals by Gender",
-       x = "Year",
-       y = "Salary") +
+
+# SALARIO POR OCUPACION CONCRETA Y GENERO #
+ggplot(salarioSexoOcupacion, aes(x = Ocupación, y = Total, fill = Sexo)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  coord_flip() +  # Flip for better readability
+  labs(title = "Average Salary by Occupation and Gender",
+       x = "Occupation",
+       y = "Average Salary",
+       fill = "Gender") +
   theme_minimal()
+
+# POR GENERO Y OCUPACIÓN #
+ggplot(salarioSexoOcupacion, aes(x = Periodo, y = Total, color = Sexo)) +
+  geom_line(size = 1) +
+  facet_wrap(~ Ocupación, scales = "free_y") +
+  labs(title = "Salary Trends Over Time by Gender and Occupation",
+       x = "Year",
+       y = "Salary",
+       color = "Gender") +
+  theme_minimal()
+
+# SALARIO POR SECTOR Y GENERO #
+ggplot(salarioSexoSector, aes(x = Sector, y = Total, fill = Sexo)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  coord_flip() +  # Flip for better readability
+  labs(title = "Average Salary by Sector and Gender",
+       x = "Sector",
+       y = "Average Salary",
+       fill = "Gender") +
+  theme_minimal()
+
+# POR REGIONES #
+ggplot(salarioSexoSector, aes(x = CA, y = Total, fill = Sexo)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  coord_flip() +
+  labs(title = "Average Salary by Region and Gender",
+       x = "Region",
+       y = "Average Salary",
+       fill = "Gender") +
+  theme_minimal()
+
+##############################
+
+############ SATISFACCIÓN ###########
+
+
+# SATISFACCIÖN POR PAISES #
+# Filtrar por porcentajes
+satisfaccionEmpleo_percentages <- subset(satisfaccionEmpleo, Unidad == "Porcentajes")
+
+# Bar chart for satisfaction levels
+ggplot(satisfaccionEmpleo_percentages, aes(x = País, y = Total, fill = Satisfacción)) +
+  geom_bar(stat = "identity", position = "stack") +
+  labs(title = "Satisfaction Levels by Country",
+       x = "Country",
+       y = "Percentage",
+       fill = "Satisfaction Level") +
+  theme_minimal()
+
+
+# POR PAIS EN NIVELES #
+# Grouped bar chart for satisfaction levels
+ggplot(satisfaccionEmpleo_percentages, aes(x = Satisfacción, y = Total, fill = País)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Comparison of Satisfaction Levels by Country",
+       x = "Satisfaction Level",
+       y = "Percentage",
+       fill = "Country") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+##############################
+
+############ TIEMPO TRABAJADO ############
+
+# Aggregate data for average hours
+agg_data <- tiempoEmpleo %>%
+  group_by(SectorActividad, TiempoTrabajo) %>%
+  summarize(AverageHoras = mean(HorasTotales, na.rm = TRUE))
+
+# Bar chart for average hours
+ggplot(agg_data, aes(x = TiempoTrabajo, y = AverageHoras, fill = SectorActividad)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  coord_flip() +
+  labs(title = "Average Hours by Sector and Time Category",
+       x = "Time Category",
+       y = "Average Hours",
+       fill = "Sector") +
+  theme_minimal()
+
+##############################
+
+############ TIEMPO TRABAJADO ############
+
+# Filter for percentage data
+ocupadosSexoRama_pct <- subset(ocupadosSexoRama, Unidad == "Porcentaje")
+
+# Stacked bar chart for percentage distribution
+ggplot(ocupadosSexoRama_pct, aes(x = Periodo, y = HorasTotales, fill = Sexo)) +
+  geom_bar(stat = "identity") +
+  facet_wrap(~ RamaActividad, scales = "free_y") +
+  labs(title = "Percentage Distribution of Hours by Activity and Gender",
+       x = "Period",
+       y = "Percentage",
+       fill = "Gender") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+##############################
