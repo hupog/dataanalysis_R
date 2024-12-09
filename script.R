@@ -95,41 +95,38 @@ library(ggplot2)
 # SALARIO POR OCUPACION CONCRETA Y GENERO #
 ggplot(salarioSexoOcupacion, aes(x = Ocupación, y = Total, fill = Sexo)) +
   geom_bar(stat = "identity", position = "dodge") +
-  coord_flip() +  # Flip for better readability
-  labs(title = "Average Salary by Occupation and Gender",
-       x = "Occupation",
-       y = "Average Salary",
-       fill = "Gender") +
+  coord_flip() +  # Lo giramos para que se lea mejor debido a que la gráfica crece hacia la derecha
+  labs(title = "Salario Promedio por Ocupación y Género",
+       x = "Ocupación",
+       y = "Salario Promedio") +
   theme_minimal()
 
 # POR GENERO Y OCUPACIÓN #
 ggplot(salarioSexoOcupacion, aes(x = Periodo, y = Total, color = Sexo)) +
   geom_line(size = 1) +
   facet_wrap(~ Ocupación, scales = "free_y") +
-  labs(title = "Salary Trends Over Time by Gender and Occupation",
-       x = "Year",
-       y = "Salary",
-       color = "Gender") +
+  labs(title = "Tendencias Salariales en el Tiempo por Género y Ocupación",
+       x = "Año",
+       y = "Salario",
+       color = "Sexo") +
   theme_minimal()
 
 # SALARIO POR SECTOR Y GENERO #
 ggplot(salarioSexoSector, aes(x = Sector, y = Total, fill = Sexo)) +
   geom_bar(stat = "identity", position = "dodge") +
-  coord_flip() +  # Flip for better readability
-  labs(title = "Average Salary by Sector and Gender",
+  coord_flip() +  # Giramos por lo mismo que la anterior
+  labs(title = "Salario Promedio por Sector y Género",
        x = "Sector",
-       y = "Average Salary",
-       fill = "Gender") +
+       y = "Salario") +
   theme_minimal()
 
 # POR REGIONES #
 ggplot(salarioSexoSector, aes(x = CA, y = Total, fill = Sexo)) +
   geom_bar(stat = "identity", position = "dodge") +
   coord_flip() +
-  labs(title = "Average Salary by Region and Gender",
+  labs(title = "Salario Promedio por CA y Género",
        x = "Region",
-       y = "Average Salary",
-       fill = "Gender") +
+       y = "Salario Promedio") +
   theme_minimal()
 
 ##############################
@@ -137,28 +134,28 @@ ggplot(salarioSexoSector, aes(x = CA, y = Total, fill = Sexo)) +
 ############ SATISFACCIÓN ###########
 
 
-# SATISFACCIÖN POR PAISES #
+# SATISFACCIÓN POR PAISES #
 # Filtrar por porcentajes
 satisfaccionEmpleo_percentages <- subset(satisfaccionEmpleo, Unidad == "Porcentajes")
 
-# Bar chart for satisfaction levels
+# Barra
 ggplot(satisfaccionEmpleo_percentages, aes(x = País, y = Total, fill = Satisfacción)) +
   geom_bar(stat = "identity", position = "stack") +
-  labs(title = "Satisfaction Levels by Country",
-       x = "Country",
-       y = "Percentage",
-       fill = "Satisfaction Level") +
+  labs(title = "Niveles de Satisfacción por País",
+       x = "País",
+       y = "Porcentaje",
+       fill = "Nivel de Satisfacción") +
   theme_minimal()
 
 
 # POR PAIS EN NIVELES #
-# Grouped bar chart for satisfaction levels
+# Barra
 ggplot(satisfaccionEmpleo_percentages, aes(x = Satisfacción, y = Total, fill = País)) +
   geom_bar(stat = "identity", position = "dodge") +
-  labs(title = "Comparison of Satisfaction Levels by Country",
-       x = "Satisfaction Level",
-       y = "Percentage",
-       fill = "Country") +
+  labs(title = "Comparación de Niveles de Satisfacción por País",
+       x = "Nivel de Satisfacción",
+       y = "Porcentaje",
+       fill = "País") +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
@@ -167,18 +164,18 @@ ggplot(satisfaccionEmpleo_percentages, aes(x = Satisfacción, y = Total, fill = 
 
 ############ TIEMPO TRABAJADO ############
 
-# Aggregate data for average hours
+# Agrupación para poder mostrar en gráfico
 agg_data <- tiempoEmpleo %>%
   group_by(SectorActividad, TiempoTrabajo) %>%
   summarize(AverageHoras = mean(HorasTotales, na.rm = TRUE))
 
-# Bar chart for average hours
+# Barra horas promedio
 ggplot(agg_data, aes(x = TiempoTrabajo, y = AverageHoras, fill = SectorActividad)) +
   geom_bar(stat = "identity", position = "dodge") +
   coord_flip() +
-  labs(title = "Average Hours by Sector and Time Category",
-       x = "Time Category",
-       y = "Average Hours",
+  labs(title = "Horas promedio basado en el Sector y Tipo de Hora",
+       x = "Tipo de horas",
+       y = "Horas promedio",
        fill = "Sector") +
   theme_minimal()
 
@@ -186,18 +183,76 @@ ggplot(agg_data, aes(x = TiempoTrabajo, y = AverageHoras, fill = SectorActividad
 
 ############ TIEMPO TRABAJADO ############
 
-# Filter for percentage data
+# Seleccionamos solo porcentajes
 ocupadosSexoRama_pct <- subset(ocupadosSexoRama, Unidad == "Porcentaje")
 
-# Stacked bar chart for percentage distribution
+# Diagrama barras por cada actividad y genero
 ggplot(ocupadosSexoRama_pct, aes(x = Periodo, y = HorasTotales, fill = Sexo)) +
   geom_bar(stat = "identity") +
   facet_wrap(~ RamaActividad, scales = "free_y") +
-  labs(title = "Percentage Distribution of Hours by Activity and Gender",
-       x = "Period",
-       y = "Percentage",
-       fill = "Gender") +
+  labs(title = "Porcentaje de Distribución de Horas por Actividad y Género",
+       x = "Período",
+       y = "Porcentaje",
+       fill = "Sexo") +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
+##############################
+
+############ PROBABILIDAD ############
+
+# Filtramos por actividad, en este ejemplo, la primera, Agricultura, ganderia, ..., y género para hacer la estimación
+subset_data <- subset(ocupadosSexoRama, RamaActividad == "01 Agricultura, ganadería, caza y servicios relacionados con las mismas" & Sexo == "Ambos sexos" &  Unidad == "Valor absoluto")
+
+mu <- mean(subset_data$HorasTotales, na.rm = TRUE)
+sigma <- sd(subset_data$HorasTotales, na.rm = TRUE)
+
+# Probabilidad de que las horas totales sea mayor que 50000: P(HorasTotales <= 50000)
+p_value <- pnorm(50000, mean = mu, sd = sigma)
+print(paste("P(HorasTotales <= 50000):", p_value))
+# Si lo pensamos es un resultado lógico porque no hay ningún valor igual ni por encima de 50000
+
+# Percentil 90
+quantile_90 <- qnorm(0.90, mean = mu, sd = sigma)
+print(paste("Percentil 90 de HorasTotales:", quantile_90))
+
+
+####
+# Estimamos lambda como la media de horas totales
+lambda <- mean(subset_data$HorasTotales, na.rm = TRUE)
+
+# Probabilidad: P(HorasTotales = 5000)
+prob <- dpois(5000, lambda)
+print(paste("P(HorasTotales = 5000):", prob))
+
+# Hacemos una simulación con 100 valores autogenerados de normal
+simulated_data <- rpois(100, lambda)
+hist(simulated_data, main = "Simulación de horas trabajadas (Poisson)", xlab = "Horas Totales")
+
+
+###
+# Definimos parametros: Número total de respuestas (n) y probabilidad de "Satisfecho en gran medida" (p)
+n <- 100  # tamaño de ejemplo
+p <- 0.54  # from the percentage of "Satisfecho en gran medida"
+
+# Probabilidad: P(X <= 60)
+prob_binom <- pbinom(60, size = n, prob = p)
+print(paste("P(X <= 60):", prob_binom))
+
+# Simulación de una binomial
+simulated_satisfaction <- rbinom(100, size = n, prob = p)
+hist(simulated_satisfaction, main = "Respuestas de la Simulación", xlab = "Cantidad de Satisfecho en gran medida")
+
+
+###
+# Calculamos lambda como 1 / media de horas totales
+lambda_exp <- 1 / mean(tiempoEmpleo$HorasTotales, na.rm = TRUE)
+
+# Probabilidad: P(HorasTotales <= 200)
+prob_exp <- pexp(200, rate = lambda_exp)
+print(paste("P(HorasTotales <= 200):", prob_exp))
+
+# Simulación de una exponencial
+simulated_time <- rexp(100, rate = lambda_exp)
+hist(simulated_time, main = "Tiempo trabajado Simulado (Exponencial)", xlab = "Horas")
 ##############################
