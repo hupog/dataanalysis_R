@@ -88,7 +88,8 @@ str(ocupadosSexoRama)
 
 install.packages("ggplot2")
 library(ggplot2)
-
+install.packages("dyplr")
+library(dplyr)
 ############ COMPARACION SALARIOS ############
 
 
@@ -99,16 +100,6 @@ ggplot(salarioSexoOcupacion, aes(x = Ocupación, y = Total, fill = Sexo)) +
   labs(title = "Salario Promedio por Ocupación y Género",
        x = "Ocupación",
        y = "Salario Promedio") +
-  theme_minimal()
-
-# POR GENERO Y OCUPACIÓN #
-ggplot(salarioSexoOcupacion, aes(x = Periodo, y = Total, color = Sexo)) +
-  geom_line(size = 1) +
-  facet_wrap(~ Ocupación, scales = "free_y") +
-  labs(title = "Tendencias Salariales en el Tiempo por Género y Ocupación",
-       x = "Año",
-       y = "Salario",
-       color = "Sexo") +
   theme_minimal()
 
 # SALARIO POR SECTOR Y GENERO #
@@ -124,10 +115,11 @@ ggplot(salarioSexoSector, aes(x = Sector, y = Total, fill = Sexo)) +
 ggplot(salarioSexoSector, aes(x = CA, y = Total, fill = Sexo)) +
   geom_bar(stat = "identity", position = "dodge") +
   coord_flip() +
-  labs(title = "Salario Promedio por CA y Género",
+  labs(title = "Average Salary by Region and Gender",
        x = "Region",
-       y = "Salario Promedio") +
+       y = "Average Salary") +
   theme_minimal()
+
 
 ##############################
 
@@ -143,8 +135,7 @@ ggplot(satisfaccionEmpleo_percentages, aes(x = País, y = Total, fill = Satisfac
   geom_bar(stat = "identity", position = "stack") +
   labs(title = "Niveles de Satisfacción por País",
        x = "País",
-       y = "Porcentaje",
-       fill = "Nivel de Satisfacción") +
+       y = "Porcentaje") +
   theme_minimal()
 
 
@@ -154,8 +145,7 @@ ggplot(satisfaccionEmpleo_percentages, aes(x = Satisfacción, y = Total, fill = 
   geom_bar(stat = "identity", position = "dodge") +
   labs(title = "Comparación de Niveles de Satisfacción por País",
        x = "Nivel de Satisfacción",
-       y = "Porcentaje",
-       fill = "País") +
+       y = "Porcentaje") +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
@@ -175,8 +165,7 @@ ggplot(agg_data, aes(x = TiempoTrabajo, y = AverageHoras, fill = SectorActividad
   coord_flip() +
   labs(title = "Horas promedio basado en el Sector y Tipo de Hora",
        x = "Tipo de horas",
-       y = "Horas promedio",
-       fill = "Sector") +
+       y = "Horas promedio") +
   theme_minimal()
 
 ##############################
@@ -192,8 +181,7 @@ ggplot(ocupadosSexoRama_pct, aes(x = Periodo, y = HorasTotales, fill = Sexo)) +
   facet_wrap(~ RamaActividad, scales = "free_y") +
   labs(title = "Porcentaje de Distribución de Horas por Actividad y Género",
        x = "Período",
-       y = "Porcentaje",
-       fill = "Sexo") +
+       y = "Porcentaje") +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
@@ -231,7 +219,7 @@ hist(simulated_data, main = "Simulación de horas trabajadas (Poisson)", xlab = 
 
 
 ###
-# Definimos parametros: Número total de respuestas (n) y probabilidad de "Satisfecho en gran medida" (p)
+# Definimos parametros: Número total de respuestas (n) y probabilidad de "Satisfecho en gran medida" (p), escojo "Satisfecho en gran medida" ya que es la muestra poblacional mas grande en el dataset.
 n <- 100  # tamaño de ejemplo
 p <- 0.54  # from the percentage of "Satisfecho en gran medida"
 
@@ -256,3 +244,28 @@ print(paste("P(HorasTotales <= 200):", prob_exp))
 simulated_time <- rexp(100, rate = lambda_exp)
 hist(simulated_time, main = "Tiempo trabajado Simulado (Exponencial)", xlab = "Horas")
 ##############################
+
+# Filtramos por ocupaciones
+grouped_data <- salarioSexoOcupacion %>%
+  group_by(Ocupación) %>%
+  summarise(mean_salary = mean(Total), sd_salary = sd(Total), n = n())
+
+# Calculamos intervalos de confianza
+grouped_data <- grouped_data %>%
+  mutate(
+    se = sd_salary / sqrt(n),
+    ci_lower = mean_salary - qt(0.975, df = n - 1) * se,
+    ci_upper = mean_salary + qt(0.975, df = n - 1) * se
+  )
+print(grouped_data)
+###AÑADIR CONCLUSIONES###
+
+# Probamos si la varianza de HorasTotales difiere entre dos sectores de actividad
+
+sector1 <- subset(tiempoEmpleo, SectorActividad == "Construcción")
+sector2 <- subset(tiempoEmpleo, SectorActividad == "Servicios")
+
+# Variance test
+var.test(sector1$HorasTotales, sector2$HorasTotales)
+###AÑADIR CONCLUSIONES###
+
