@@ -1,146 +1,284 @@
 ---
 title: "Memoria Trabajo Final ME"
+author: ""
+date: "`r Sys.Date()`"
 output: html_document
-date: "2024-2025"
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
+# 1. Data Reading, Exploration, and Cleaning
 
-**Conjuntos de datos analizados:**
-- Salario por Sexo y Ocupación
-- Salario por Sexo y Sector
-- Satisfacción en el Empleo
-- Tiempo de Trabajo
-- Ocupados por Sexo y Rama de Actividad
-
----
-
-# Lectura de los datasets
+In this section, we read several datasets related to employment statistics. We perform initial exploration and clean the data for further analysis.
 
 ```{r}
-# Leemos los datasets
-salarioSexoOcupacion <- read.csv("./datasets/salarioSexoOcupacion2022.csv", TRUE, sep = ";")
-salarioSexoSector <- read.csv("./datasets/salarioSexoSector2022.csv", TRUE, sep = ";")
-satisfaccionEmpleo <- read.csv("./datasets/satisfaccionEmpleo.csv", TRUE, sep = ";")
-tiempoEmpleo <- read.csv("./datasets/tiempoEmpleo.csv", TRUE, sep = ";")
-ocupadosSexoRama <- read.csv("./datasets/ocupadosSexoRama.csv", TRUE, sep = ";")
-```
+# Reading datasets
+salarioSexoOcupacion <- read.csv("./datasets/salarioSexoOcupacion2022.csv", TRUE, sep=";")
+salarioSexoSector <- read.csv("./datasets/salarioSexoSector2022.csv", TRUE, sep=";")
+satisfaccionEmpleo <- read.csv("./datasets/satisfaccionEmpleo.csv", TRUE, sep=";")
+tiempoEmpleo <- read.csv("./datasets/tiempoEmpleo.csv", TRUE, sep=";")
+ocupadosSexoRama <- read.csv("./datasets/ocupadosSexoRama.csv", TRUE, sep=";")
 
----
-
-# Transformaciones y Ajustes
-
-## Salario por Sexo y Ocupación
-
-```{r}
-# Echamos un vistazo inicial a los datos
+# Initial data exploration
 head(salarioSexoOcupacion)
 head(salarioSexoSector)
 head(satisfaccionEmpleo)
 head(tiempoEmpleo)
 head(ocupadosSexoRama)
-```
 
-## Salario por Sexo y Ocupación
+# Renaming columns for easier handling
+colnames(salarioSexoOcupacion)[colnames(salarioSexoOcupacion) =="Grupos.principales.de.la.CNO.11"] <- "Ocupación"
+colnames(salarioSexoSector)[colnames(salarioSexoSector) =="Sectores.de.actividad"] <- "Sector"
+colnames(salarioSexoSector)[colnames(salarioSexoSector) =="Comunidades.autónomas"] <- "CA"
+colnames(satisfaccionEmpleo)[colnames(satisfaccionEmpleo) =="País.de.nacimiento"] <- "País"
+colnames(satisfaccionEmpleo)[colnames(satisfaccionEmpleo) =="Tipo.de.dato"] <- "Unidad"
+colnames(satisfaccionEmpleo)[colnames(satisfaccionEmpleo) =="Según.sea.el.nivel.de.satisfacción.en.su.empleo.actual"] <- "Satisfacción"
+colnames(tiempoEmpleo)[colnames(tiempoEmpleo) =="Sectores.de.actividad.CNAE.2009"] <- "SectorActividad"
+colnames(tiempoEmpleo)[colnames(tiempoEmpleo) =="Tiempo.de.trabajo"] <- "TiempoTrabajo"
+colnames(tiempoEmpleo)[colnames(tiempoEmpleo) =="Total"] <- "HorasTotales"
+colnames(ocupadosSexoRama)[colnames(ocupadosSexoRama) =="Rama.de.actividad.CNAE.2009"] <- "RamaActividad"
+colnames(ocupadosSexoRama)[colnames(ocupadosSexoRama) =="Total"] <- "HorasTotales"
 
-```{r}
-# Cambiamos nombres de columnas para mayor legibilidad
-colnames(salarioSexoOcupacion)[colnames(salarioSexoOcupacion) == "Grupos.principales.de.la.CNO.11"] <- "Ocupación"
-
-# Ajustamos tipos de datos
+# Adjusting data types and cleaning numeric fields
 salarioSexoOcupacion$Ocupación <- as.factor(salarioSexoOcupacion$Ocupación)
 salarioSexoOcupacion$Sexo <- as.factor(salarioSexoOcupacion$Sexo)
-
-# Convertimos "Total" a numérico
 salarioSexoOcupacion$Total <- gsub("\\.", "", salarioSexoOcupacion$Total)
 salarioSexoOcupacion$Total <- gsub(",", ".", salarioSexoOcupacion$Total)
+salarioSexoOcupacion$Total <- gsub("-", "", salarioSexoOcupacion$Total)
 salarioSexoOcupacion$Total <- as.numeric(salarioSexoOcupacion$Total)
-
-# Exploramos la estructura final
 str(salarioSexoOcupacion)
-```
 
-## Salario por Sexo y Sector
-
-```{r}
-# Cambiamos nombres de columnas para mayor legibilidad
-colnames(salarioSexoSector)[colnames(salarioSexoSector) == "Sectores.de.actividad"] <- "Sector"
-colnames(salarioSexoSector)[colnames(salarioSexoSector) == "Comunidades.autónomas"] <- "CA"
-
-# Ajustamos tipos de datos
+str(salarioSexoSector)
 salarioSexoSector$CA <- as.factor(salarioSexoSector$CA)
 salarioSexoSector$Sector <- as.factor(salarioSexoSector$Sector)
 salarioSexoSector$Sexo <- as.factor(salarioSexoSector$Sexo)
-
-# Convertimos "Total" a numérico
 salarioSexoSector$Total <- gsub("\\.", "", salarioSexoSector$Total)
 salarioSexoSector$Total <- gsub(",", ".", salarioSexoSector$Total)
+salarioSexoSector$Total <- gsub("-", "", salarioSexoSector$Total)
 salarioSexoSector$Total <- as.numeric(salarioSexoSector$Total)
-
-# Exploramos la estructura final
 str(salarioSexoSector)
-```
 
-## Satisfacción en el Empleo
-
-```{r}
-# Cambiamos nombres de columnas para mayor legibilidad
-colnames(satisfaccionEmpleo)[colnames(satisfaccionEmpleo) == "País.de.nacimiento"] <- "País"
-colnames(satisfaccionEmpleo)[colnames(satisfaccionEmpleo) == "Tipo.de.dato"] <- "Unidad"
-colnames(satisfaccionEmpleo)[colnames(satisfaccionEmpleo) == "Según.sea.el.nivel.de.satisfacción.en.su.empleo.actual"] <- "Satisfacción"
-
-# Ajustamos tipos de datos
+str(satisfaccionEmpleo)
 satisfaccionEmpleo$País <- as.factor(satisfaccionEmpleo$País)
 satisfaccionEmpleo$Unidad <- as.factor(satisfaccionEmpleo$Unidad)
 satisfaccionEmpleo$Satisfacción <- as.factor(satisfaccionEmpleo$Satisfacción)
-
-# Convertimos "Total" a numérico
 satisfaccionEmpleo$Total <- gsub("\\.", "", satisfaccionEmpleo$Total)
 satisfaccionEmpleo$Total <- gsub(",", ".", satisfaccionEmpleo$Total)
+satisfaccionEmpleo$Total <- gsub("-", "", satisfaccionEmpleo$Total)
 satisfaccionEmpleo$Total <- as.numeric(satisfaccionEmpleo$Total)
-
-# Exploramos la estructura final
 str(satisfaccionEmpleo)
-```
 
-## Tiempo de Trabajo
-
-```{r}
-# Cambiamos nombres de columnas para mayor legibilidad
-colnames(tiempoEmpleo)[colnames(tiempoEmpleo) == "Sectores.de.actividad.CNAE.2009"] <- "SectorActividad"
-colnames(tiempoEmpleo)[colnames(tiempoEmpleo) == "Tiempo.de.trabajo"] <- "TiempoTrabajo"
-colnames(tiempoEmpleo)[colnames(tiempoEmpleo) == "Total"] <- "HorasTotales"
-
-# Ajustamos tipos de datos
+str(tiempoEmpleo)
 tiempoEmpleo$SectorActividad <- as.factor(tiempoEmpleo$SectorActividad)
 tiempoEmpleo$TiempoTrabajo <- as.factor(tiempoEmpleo$TiempoTrabajo)
-
-# Convertimos "HorasTotales" a numérico
 tiempoEmpleo$HorasTotales <- gsub("\\.", "", tiempoEmpleo$HorasTotales)
 tiempoEmpleo$HorasTotales <- gsub(",", ".", tiempoEmpleo$HorasTotales)
+tiempoEmpleo$HorasTotales <- gsub("-", "", tiempoEmpleo$HorasTotales)
 tiempoEmpleo$HorasTotales <- as.numeric(tiempoEmpleo$HorasTotales)
-
-# Exploramos la estructura final
+tiempoEmpleo$Periodo <- factor(tiempoEmpleo$Periodo, levels = unique(tiempoEmpleo$Periodo))
 str(tiempoEmpleo)
-```
 
-## Ocupados por Sexo y Rama de Actividad
-
-```{r}
-# Cambiamos nombres de columnas para mayor legibilidad
-colnames(ocupadosSexoRama)[colnames(ocupadosSexoRama) == "Rama.de.actividad.CNAE.2009"] <- "RamaActividad"
-
-# Ajustamos tipos de datos
+str(ocupadosSexoRama)
 ocupadosSexoRama$RamaActividad <- as.factor(ocupadosSexoRama$RamaActividad)
 ocupadosSexoRama$Sexo <- as.factor(ocupadosSexoRama$Sexo)
-
-# Convertimos "HorasTotales" a numérico
+ocupadosSexoRama$Unidad <- as.factor(ocupadosSexoRama$Unidad)
 ocupadosSexoRama$HorasTotales <- gsub("\\.", "", ocupadosSexoRama$HorasTotales)
 ocupadosSexoRama$HorasTotales <- gsub(",", ".", ocupadosSexoRama$HorasTotales)
+ocupadosSexoRama$HorasTotales <- gsub("-", "", ocupadosSexoRama$HorasTotales)
 ocupadosSexoRama$HorasTotales <- as.numeric(ocupadosSexoRama$HorasTotales)
-
-# Exploramos la estructura final
+ocupadosSexoRama$Periodo <- factor(ocupadosSexoRama$Periodo, levels = unique(ocupadosSexoRama$Periodo))
 str(ocupadosSexoRama)
+```
+
+# 2. Library Installation
+
+We use the `ggplot2` library for creating visualizations.
+
+```{r}
+if(!require(ggplot2)) install.packages("ggplot2")
+library(ggplot2)
+if(!require(dplyr)) install.packages("dplyr")
+library(dplyr)
+```
+
+# 3. Data Analysis and Visualization
+
+## Salary Comparison
+
+### Salary by Specific Occupation and Gender
+
+We analyze the average salary based on specific occupations and gender using bar plots.
+
+```{r}
+ggplot(salarioSexoOcupacion, aes(x = Ocupación, y = Total, fill = Sexo)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  coord_flip() +
+  labs(title = "Salario Promedio por Ocupación y Género",
+       x = "Ocupación",
+       y = "Salario Promedio") +
+  theme_minimal()
+```
+
+### Salary Trends Over Time by Gender and Occupation
+
+```{r}
+ggplot(salarioSexoOcupacion, aes(x = Periodo, y = Total, color = Sexo)) +
+  geom_line(size = 1) +
+  facet_wrap(~ Ocupación, scales = "free_y") +
+  labs(title = "Tendencias Salariales en el Tiempo por Género y Ocupación",
+       x = "Año",
+       y = "Salario",
+       color = "Sexo") +
+  theme_minimal()
+```
+
+### Salary by Sector and Gender
+
+```{r}
+ggplot(salarioSexoSector, aes(x = Sector, y = Total, fill = Sexo)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  coord_flip() +
+  labs(title = "Salario Promedio por Sector y Género",
+       x = "Sector",
+       y = "Salario") +
+  theme_minimal()
+```
+
+### Regional Salary Comparisons
+
+```{r}
+ggplot(salarioSexoSector, aes(x = CA, y = Total, fill = Sexo)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  coord_flip() +
+  labs(title = "Salario Promedio por CA y Género",
+       x = "Region",
+       y = "Salario Promedio") +
+  theme_minimal()
+```
+
+## Job Satisfaction
+
+### Satisfaction Levels by Country
+
+```{r}
+satisfaccionEmpleo_percentages <- subset(satisfaccionEmpleo, Unidad == "Porcentajes")
+ggplot(satisfaccionEmpleo_percentages, aes(x = País, y = Total, fill = Satisfacción)) +
+  geom_bar(stat = "identity", position = "stack") +
+  labs(title = "Niveles de Satisfacción por País",
+       x = "País",
+       y = "Porcentaje",
+       fill = "Nivel de Satisfacción") +
+  theme_minimal()
+```
+
+### Comparison of Satisfaction Levels by Country
+
+```{r}
+ggplot(satisfaccionEmpleo_percentages, aes(x = Satisfacción, y = Total, fill = País)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Comparación de Niveles de Satisfacción por País",
+       x = "Nivel de Satisfacción",
+       y = "Porcentaje",
+       fill = "País") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+## Working Time
+
+### Average Hours Worked by Sector and Type of Work
+
+```{r}
+agg_data <- tiempoEmpleo %>%
+  group_by(SectorActividad, TiempoTrabajo) %>%
+  summarize(AverageHoras = mean(HorasTotales, na.rm = TRUE))
+
+ggplot(agg_data, aes(x = TiempoTrabajo, y = AverageHoras, fill = SectorActividad)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  coord_flip() +
+  labs(title = "Horas promedio basado en el Sector y Tipo de Hora",
+       x = "Tipo de horas",
+       y = "Horas promedio",
+       fill = "Sector") +
+  theme_minimal()
+```
+
+## Employment Distribution
+
+### Percentage Distribution of Hours by Activity and Gender
+
+```{r}
+ocupadosSexoRama_pct <- subset(ocupadosSexoRama, Unidad == "Porcentaje")
+ggplot(ocupadosSexoRama_pct, aes(x = Periodo, y = HorasTotales, fill = Sexo)) +
+  geom_bar(stat = "identity") +
+  facet_wrap(~ RamaActividad, scales = "free_y") +
+  labs(title = "Porcentaje de Distribución de Horas por Actividad y Género",
+       x = "Período",
+       y = "Porcentaje",
+       fill = "Sexo") +
+  theme_minimal()
+```
+
+# 4. Statistical Analysis
+
+## Probability Calculations
+
+In this section, we perform various probability calculations related to the data.
+
+### Normal Distribution Example
+
+```{r}
+subset_data <- subset(ocupadosSexoRama, RamaActividad == "01 Agricultura, ganadería, caza y servicios relacionados con las mismas" & Sexo == "Ambos sexos" &  Unidad == "Valor absoluto")
+
+mu <- mean(subset_data$HorasTotales, na.rm = TRUE)
+sigma <- sd(subset_data$HorasTotales, na.rm = TRUE)
+
+# Probability of total hours being greater than 50000
+p_value <- pnorm(50000, mean = mu, sd = sigma)
+print(paste("P(HorasTotales <= 50000):", p_value))
+
+# 90th Percentile
+quantile_90 <- qnorm(0.90, mean = mu, sd = sigma)
+print(paste("Percentil 90 de HorasTotales:", quantile_90))
+```
+
+### Poisson Distribution Example
+
+```{r}
+lambda <- mean(subset_data$HorasTotales, na.rm = TRUE)
+
+# Probability: P(HorasTotales = 5000)
+prob <- dpois(5000, lambda)
+print(paste("P(HorasTotales = 5000):", prob))
+
+# Simulation
+simulated_data <- rpois(100, lambda)
+hist(simulated_data, main = "Simulación de horas trabajadas (Poisson)", xlab = "Horas Totales")
+```
+
+### Binomial Distribution Example
+
+```{r}
+n <- 100  # sample size
+p <- 0.54  # from the percentage of "Satisfecho en gran medida"
+
+# Probability: P(X <= 60)
+prob_binom <- pbinom(60, size = n, prob = p)
+print(paste("P(X <= 60):", prob_binom))
+
+# Simulation
+simulated_satisfaction <- rbinom(100, size = n, prob = p)
+hist(simulated_satisfaction, main = "Respuestas de la Simulación", xlab = "Cantidad de Satisfecho en gran medida")
+```
+
+### Exponential Distribution Example
+
+```{r}
+lambda_exp <- 1 / mean(tiempoEmpleo$HorasTotales, na.rm = TRUE)
+
+# Probability: P(HorasTotales <= 200)
+prob_exp <- pexp(200, rate = lambda_exp)
+print(paste("P(HorasTotales <= 200):", prob_exp))
+
+# Simulation
+simulated_time <- rexp(100, rate = lambda_exp)
+hist(simulated_time, main = "Tiempo trabajado Simulado (Exponencial)", xlab = "Horas")
 ```

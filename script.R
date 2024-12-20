@@ -256,3 +256,4 @@ print(paste("P(HorasTotales <= 200):", prob_exp))
 simulated_time <- rexp(100, rate = lambda_exp)
 hist(simulated_time, main = "Tiempo trabajado Simulado (Exponencial)", xlab = "Horas")
 ##############################
+
